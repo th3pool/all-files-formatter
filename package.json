@@ -65,12 +65,17 @@
                         },
                         "type": "array",
                         "markdownDescription": "Glob patters for files to include\n\nExample:\n\n - `**/*.*` will `include` all files with an extension\n\nFeel free to add as many as you want, if you need help, check out the [vscode guide on glob patterns](https://code.visualstudio.com/docs/editor/glob-patterns)."
+                    },
+                    "automaticallyCloseFiles": {
+                        "description": "Whether or not to close all files when finished",
+                        "default": true,
+                        "type": "boolean"
                     }
                 }
             }
         ]
     },
-    "icon": "",
+    "icon": "./resources/main.png",
     "scripts": {
         "vscode:prepublish": "npm run package",
         "compile": "npm run check-types && npm run lint && node esbuild.js",

@@ -11,9 +11,6 @@ export async function activate(context: vscode.ExtensionContext) {
     const formatAll = vscode.commands.registerCommand(
         'all-files-formatter.formatAll',
         async () => {
-            vscode.window.showInformationMessage(
-                'Getting all the files to format'
-            );
             settings = workspace.getConfiguration();
 
             includePattern = getIncludePattern();
@@ -22,7 +19,23 @@ export async function activate(context: vscode.ExtensionContext) {
                 includePattern,
                 ignorePattern
             );
-            console.log(filesToFormat.length);
+            if (filesToFormat.length >= 1) {
+                vscode.window
+                    .showInformationMessage(
+                        `Do you really want to format ${filesToFormat.length} file(s)`,
+                        'yes',
+                        'no'
+                    )
+                    .then((selection) => {
+                        if (selection === 'yes') {
+                            formatFiles(filesToFormat);
+                        } else {
+                            vscode.window.showInformationMessage(
+                                `Process cancelled!`
+                            );
+                        }
+                    });
+            }
         }
     );
     context.subscriptions.push(formatAll);
@@ -57,8 +70,14 @@ async function getIgnorePattern() {
             tempPattern += element + ',';
         });
     }
-    const gitPattern = await readGitignore();
-    tempPattern = tempPattern + gitPattern;
+    const readGit: boolean | undefined = settings.get('exclusions.includeGit');
+    if (readGit) {
+        sentLog(`Request to check .gitignore? true`);
+        const gitPattern = await readGitignore();
+        tempPattern = tempPattern + gitPattern;
+    } else {
+        sentLog(`Request to check .gitignore? false`);
+    }
     tempPattern = tempPattern.slice(0, -1);
     return `{${tempPattern}}`;
 }
@@ -114,12 +133,8 @@ async function getFilesToFormat(include: string, exclude: string) {
     sentLog(
         `Found ${allFiles.length} files to format \n Ignore: ${ignorePattern}\n Include: ${includePattern}`
     );
-    sentUryArrayToLog(allFiles);
-    vscode.window.showInformationMessage(`Formatting ${allFiles.length} files`);
     return allFiles;
 }
-
-// busines/lib64/python313/site-packages/pip/__pycache__/__init__.cpython-313.pyc
 
 const outputChannel = vscode.window.createOutputChannel(
     'format-all-files',
@@ -129,13 +144,44 @@ const outputChannel = vscode.window.createOutputChannel(
 function sentLog(message: string) {
     outputChannel.appendLine(message);
 }
-function sentUryArrayToLog(message: vscode.Uri[]) {
-    message.forEach((element) => {
-        sentLog(element.fsPath);
-    });
-}
+// function sentUryArrayToLog(message: vscode.Uri[]) {
+//     message.forEach((element) => {
+//         sentLog(element.fsPath);
+//     });
+// }
 function sentArrayLog(message: string[]) {
     message.forEach((item) => {
         sentLog(item);
     });
+}
+
+async function formatFiles(files: vscode.Uri[]) {
+    for (let index = 0; index < files.length; index++) {
+        sentLog(`Currently formatting: ${files[index]}`);
+        try {
+            await vscode.window.showTextDocument(files[index]);
+            await vscode.commands.executeCommand(
+                'editor.action.formatDocument'
+            );
+            const closeFiles: boolean | undefined = settings.get(
+                'automaticallyCloseFiles'
+            );
+            if (closeFiles) {
+                await vscode.commands.executeCommand(
+                    'workbench.action.closeActiveEditor'
+                );
+            }
+        } catch (error) {
+            if (error instanceof Error) {
+                sentLog(error.message);
+                vscode.window.showErrorMessage(
+                    `The following error was detected: ${error.message}.`
+                );
+            }
+        }
+        sentLog(`Complete!`);
+    }
+    vscode.window.showInformationMessage(
+        `Process complete, ${files.length} files successfully formatted!`
+    );
 }
