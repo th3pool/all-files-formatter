@@ -1,0 +1,101 @@
+{
+    "name": "all-files-formatter",
+    "displayName": "All files formatter",
+    "description": "Format all files in the workspace, in a single command",
+    "version": "0.0.1",
+    "engines": {
+        "vscode": "^1.103.0"
+    },
+    "publisher": "th3pool",
+    "author": {
+        "email": "th3fishMk@proton.me",
+        "name": "fish",
+        "url": "https://github.com/th3fishMk"
+    },
+    "bugs": {
+        "url": "https://github.com/th3pool/all-files-formatter/issues"
+    },
+    "keywords": [
+        "formatter",
+        "files"
+    ],
+    "repository": {
+        "type": "github",
+        "url": "https://github.com/th3pool/all-files-formatter"
+    },
+    "categories": [
+        "Formatters"
+    ],
+    "activationEvents": [
+        "onStartupFinished"
+    ],
+    "main": "./dist/extension.js",
+    "contributes": {
+        "commands": [
+            {
+                "command": "all-files-formatter.formatAll",
+                "title": "Format all files"
+            }
+        ],
+        "configuration": [
+            {
+                "title": "All files formatter",
+                "properties": {
+                    "exclusions.ignorePattern": {
+                        "default": [
+                            "**/node_modules/**"
+                        ],
+                        "items": {
+                            "type": "string"
+                        },
+                        "type": "array",
+                        "markdownDescription": "All of the files that match this pattern will be ignored\n\nExample:\n  - `**/.**`: ignores all the dotfiles as `.gitignore`.\n  - `node_modules` will ignore all the files within the `node_modules` folder.\n\nFeel free to add as many as you want, if you need help, check out the [vscode guide on glob patterns](https://code.visualstudio.com/docs/editor/glob-patterns)."
+                    },
+                    "exclusions.includeGit": {
+                        "type": "boolean",
+                        "default": true,
+                        "markdownDescription": "Should we take into account the git file for exclusions?\n\nIf you included a file or folder `for exclusion`, we also are going to exclude it\n\n Only the .gitignore at the root file is considered"
+                    },
+                    "inclusions.includePattern": {
+                        "default": [
+                            "**/*.*"
+                        ],
+                        "items": {
+                            "type": "string"
+                        },
+                        "type": "array",
+                        "markdownDescription": "Glob patters for files to include\n\nExample:\n\n - `**/*.*` will `include` all files with an extension\n\nFeel free to add as many as you want, if you need help, check out the [vscode guide on glob patterns](https://code.visualstudio.com/docs/editor/glob-patterns)."
+                    }
+                }
+            }
+        ]
+    },
+    "icon": "",
+    "scripts": {
+        "vscode:prepublish": "npm run package",
+        "compile": "npm run check-types && npm run lint && node esbuild.js",
+        "watch": "npm-run-all -p watch:*",
+        "watch:esbuild": "node esbuild.js --watch",
+        "watch:tsc": "tsc --noEmit --watch --project tsconfig.json",
+        "package": "npm run check-types && npm run lint && node esbuild.js --production",
+        "compile-tests": "tsc -p . --outDir out",
+        "watch-tests": "tsc -p . -w --outDir out",
+        "pretest": "npm run compile-tests && npm run compile && npm run lint",
+        "check-types": "tsc --noEmit",
+        "lint": "eslint src",
+        "test": "vscode-test"
+    },
+    "devDependencies": {
+        "@types/vscode": "^1.103.0",
+        "@types/mocha": "^10.0.10",
+        "@types/node": "22.x",
+        "@typescript-eslint/eslint-plugin": "^8.42.0",
+        "@typescript-eslint/parser": "^8.42.0",
+        "eslint": "^9.34.0",
+        "esbuild": "^0.25.9",
+        "npm-run-all": "^4.1.5",
+        "typescript": "^5.9.2",
+        "@vscode/test-cli": "^0.0.11",
+        "@vscode/test-electron": "^2.5.2"
+    }
+}
