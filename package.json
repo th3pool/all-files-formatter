@@ -2,7 +2,7 @@
     "name": "all-files-formatter",
     "displayName": "All files formatter",
     "description": "Format all files in the workspace, in a single command",
-    "version": "0.0.1",
+    "version": "0.1.1",
     "engines": {
         "vscode": "^1.103.0"
     },
@@ -41,22 +41,60 @@
             {
                 "title": "All files formatter",
                 "properties": {
-                    "exclusions.ignorePattern": {
+                    "exclusions.ignorePatterns": {
                         "default": [
-                            "**/node_modules/**"
+                            "**/node_modules/**",
+                            "**/*.png",
+                            "**/*.jpg",
+                            "**/*.jpeg",
+                            "**/*.gif",
+                            "**/*.bmp",
+                            "**/*.ico",
+                            "**/*.webp",
+                            "**/*.tiff",
+                            "**/*.mp3",
+                            "**/*.wav",
+                            "**/*.ogg",
+                            "**/*.flac",
+                            "**/*.aac",
+                            "**/*.mp4",
+                            "**/*.mkv",
+                            "**/*.avi",
+                            "**/*.mov",
+                            "**/*.webm",
+                            "**/*.zip",
+                            "**/*.tar",
+                            "**/*.gz",
+                            "**/*.7z",
+                            "**/*.rar",
+                            "**/*.pdf",
+                            "**/*.doc",
+                            "**/*.docx",
+                            "**/*.xls",
+                            "**/*.xlsx",
+                            "**/*.ppt",
+                            "**/*.pptx",
+                            "**/*.ttf",
+                            "**/*.otf",
+                            "**/*.woff",
+                            "**/*.woff2",
+                            "**/*.eot",
+                            "**/*.log",
+                            "**/*.bak",
+                            "**/*.tmp"
                         ],
                         "items": {
                             "type": "string"
                         },
                         "type": "array",
-                        "markdownDescription": "All of the files that match this pattern will be ignored\n\nExample:\n  - `**/.**`: ignores all the dotfiles as `.gitignore`.\n  - `node_modules` will ignore all the files within the `node_modules` folder.\n\nFeel free to add as many as you want, if you need help, check out the [vscode guide on glob patterns](https://code.visualstudio.com/docs/editor/glob-patterns)."
+                        "markdownDescription": "All of the files that match this patterns will be ignored\n\nExample:\n - `**/node_modules/**` will ignore all the files within the `node_modules` folder.\n\nFeel free to add as many as you want, if you need help, check out the [vscode guide on glob patterns](https://code.visualstudio.com/docs/editor/glob-patterns)."
                     },
-                    "exclusions.includeGit": {
+                    "exclusions.includeGitignore": {
                         "type": "boolean",
                         "default": true,
                         "markdownDescription": "Should we take into account the git file for exclusions?\n\nIf you included a file or folder `for exclusion`, we also are going to exclude it\n\n Only the .gitignore at the root file is considered"
                     },
-                    "inclusions.includePattern": {
+                    "inclusions.includePatterns": {
                         "default": [
                             "**/*.*"
                         ],

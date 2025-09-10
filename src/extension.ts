@@ -35,6 +35,8 @@ export async function activate(context: vscode.ExtensionContext) {
                             );
                         }
                     });
+            } else {
+                vscode.window.showErrorMessage(`No files to work with`);
             }
         }
     );
@@ -47,7 +49,7 @@ function getIncludePattern() {
     console.log(`Getting include pattern`);
 
     let patternsToIgnore: string[] | undefined = settings.get(
-        'inclusions.includePattern'
+        'inclusions.includePatterns'
     );
     let tempPattern = '';
     if (patternsToIgnore) {
@@ -62,7 +64,7 @@ async function getIgnorePattern() {
     console.log(`Getting ignore pattern`);
 
     let patternsToIgnore: string[] | undefined = settings.get(
-        'exclusions.ignorePattern'
+        'exclusions.ignorePatterns'
     );
     let tempPattern = '';
     if (patternsToIgnore) {
@@ -70,7 +72,9 @@ async function getIgnorePattern() {
             tempPattern += element + ',';
         });
     }
-    const readGit: boolean | undefined = settings.get('exclusions.includeGit');
+    const readGit: boolean | undefined = settings.get(
+        'exclusions.includeGitignore'
+    );
     if (readGit) {
         sentLog(`Request to check .gitignore? true`);
         const gitPattern = await readGitignore();
@@ -131,7 +135,7 @@ async function readGitignore(): Promise<string> {
 async function getFilesToFormat(include: string, exclude: string) {
     let allFiles = await workspace.findFiles(include, exclude);
     sentLog(
-        `Found ${allFiles.length} files to format \n Ignore: ${ignorePattern}\n Include: ${includePattern}`
+        `Found ${allFiles.length} files to format \nIgnore pattern: ${ignorePattern}\nInclude pattern: ${includePattern}\n`
     );
     return allFiles;
 }
@@ -141,14 +145,13 @@ const outputChannel = vscode.window.createOutputChannel(
     'markdown'
 );
 
-function sentLog(message: string) {
-    outputChannel.appendLine(message);
+function sentLog(message: string, newLine = true) {
+    if (newLine) {
+        outputChannel.appendLine(message);
+    } else {
+        outputChannel.append(message);
+    }
 }
-// function sentUryArrayToLog(message: vscode.Uri[]) {
-//     message.forEach((element) => {
-//         sentLog(element.fsPath);
-//     });
-// }
 function sentArrayLog(message: string[]) {
     message.forEach((item) => {
         sentLog(item);
@@ -156,8 +159,9 @@ function sentArrayLog(message: string[]) {
 }
 
 async function formatFiles(files: vscode.Uri[]) {
+    let errorCount = 0;
     for (let index = 0; index < files.length; index++) {
-        sentLog(`Currently formatting: ${files[index]}`);
+        sentLog(`Currently formatting: \`${files[index]}\``, false);
         try {
             await vscode.window.showTextDocument(files[index]);
             await vscode.commands.executeCommand(
@@ -171,17 +175,100 @@ async function formatFiles(files: vscode.Uri[]) {
                     'workbench.action.closeActiveEditor'
                 );
             }
+            sentLog(`: Complete!`);
         } catch (error) {
+            errorCount++;
             if (error instanceof Error) {
+                sentLog('');
+                sentLog('[Error] message:', false);
                 sentLog(error.message);
-                vscode.window.showErrorMessage(
-                    `The following error was detected: ${error.message}.`
-                );
             }
         }
-        sentLog(`Complete!`);
     }
-    vscode.window.showInformationMessage(
-        `Process complete, ${files.length} files successfully formatted!`
-    );
+    if (errorCount === 0) {
+        vscode.window
+            .showInformationMessage(
+                `Process complete, ${files.length} files successfully formatted!`,
+                'Check logs'
+            )
+            .then((ans) => {
+                if (ans) {
+                    outputChannel.show();
+                }
+            });
+        const msg =
+            funnySuccessLogs[
+                Math.floor(Math.random() * funnySuccessLogs.length)
+            ];
+        sentLog('');
+        sentLog(msg);
+    } else {
+        vscode.window
+            .showInformationMessage(
+                `Process complete, some errors were catch in the process, would you like to see then?`,
+                'yes',
+                'no'
+            )
+            .then((answer) => {
+                if (answer === 'no') {
+                    const msg =
+                        funnySuccessLogs[
+                            Math.floor(Math.random() * funnySuccessLogs.length)
+                        ];
+                    sentLog('');
+
+                    sentLog(msg);
+                } else {
+                    const msg =
+                        funnyLogs[Math.floor(Math.random() * funnyLogs.length)];
+                    sentLog('');
+                    sentLog(msg);
+                }
+            });
+    }
 }
+const funnyLogs = [
+    'Hide the dinos, boss is coming! 🦖',
+    'Well… that escalated quickly. 🔥',
+    'Here be bugs. 🐛',
+    'Abort mission, we hit an asteroid! ☄️',
+    'Nothing to see here, just some casual chaos. 😎',
+    'When in doubt, blame the compiler. 🛠️',
+    'I swear it worked on my machine. 💻',
+    'Feature or bug? You decide. 🤔',
+    '99 little bugs in the code, 99 little bugs... 🎵',
+    'Error 404: Patience not found. ⏳',
+    'The cake is a lie, and so is this success. 🎂',
+    'Don’t worry, this is a ‘temporary’ problem. 😉',
+    'At least we didn’t delete production… yet. 🚨',
+    'One does not simply format all files without errors. 🧙',
+    'It’s not a bug, it’s an undocumented feature. 📖',
+    'Houston, we have a problem. 🚀',
+    'Plot twist: the formatter is formatting itself. 🔄',
+    'Brace yourself, logs are coming. ❄️',
+    'Don’t panic. Actually, panic a little. 😬',
+    'Surprise! More errors than expected. 🎉',
+];
+
+const funnySuccessLogs = [
+    'All files polished and shiny! ✨',
+    'Mission accomplished. High five! 🙌',
+    'Code formatted, bugs intimidated. 🐛👉🚪',
+    'Flawless victory. 🎮',
+    'Formatter has left the chat. 👋',
+    'Everything is awesome! 🎶',
+    'Zero errors, zero worries. 😌',
+    'The formatter gods are pleased. 🙏',
+    'Smooth as butter. 🧈',
+    'Victory royale! 🏆',
+    'Done and dusted. 🧹',
+    'The code is strong with this one. 🌌',
+    'May the format be with you. ✨',
+    'Formatting complete. Coffee break? ☕',
+    'Code so clean you could eat off it. 🍽️',
+    'No errors detected… today. 😉',
+    'Your files are now 20% cooler. 🕶️',
+    'Achievement unlocked: Proper Formatting! 🏅',
+    'Looks like you actually know what you’re doing. 😏',
+    'All green lights — deploy at will! 🚦',
+];
