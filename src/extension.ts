@@ -227,6 +227,8 @@ async function formatFiles(files: vscode.Uri[]) {
             });
     }
 }
+
+// This messages where generated with AI because I am too lazy and unfunny to create them myself
 const funnyLogs = [
     'Hide the dinos, boss is coming! 🦖',
     'Well… that escalated quickly. 🔥',
@@ -249,7 +251,7 @@ const funnyLogs = [
     'Don’t panic. Actually, panic a little. 😬',
     'Surprise! More errors than expected. 🎉',
 ];
-
+// This too
 const funnySuccessLogs = [
     'All files polished and shiny! ✨',
     'Mission accomplished. High five! 🙌',
