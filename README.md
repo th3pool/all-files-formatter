@@ -4,7 +4,7 @@ Format all files in your workspace, the right way.
 
 ## Features
 
-Run the command `Format all files` to format all the files in the workspace, **But ignore the same files as your `gitignore` file**.
+Run the command `AFF: Format all files` to format all the files in the workspace, **But ignore the same files as your `gitignore` file**.
 
 It is really simple:, just install the extension, run the command, confirm, and thats it
 
