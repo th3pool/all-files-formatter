@@ -2,10 +2,12 @@
     "name": "all-files-formatter",
     "displayName": "All files formatter",
     "description": "Format all files in the workspace, in a single command",
-    "version": "0.1.1",
+    "version": "0.2.1",
     "engines": {
         "vscode": "^1.103.0"
     },
+    "preview": true,
+    "icon": "./resources/main.png",
     "publisher": "th3pool",
     "categories": [
         "Formatters"
@@ -34,7 +36,8 @@
         "commands": [
             {
                 "command": "all-files-formatter.formatAll",
-                "title": "Format all files"
+                "title": "Format all files",
+                "category": "AFF"
             }
         ],
         "configuration": [
