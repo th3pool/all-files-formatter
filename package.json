@@ -2,7 +2,7 @@
     "name": "all-files-formatter",
     "displayName": "All files formatter",
     "description": "Format all files in the workspace, in a single command",
-    "version": "0.2.1",
+    "version": "0.2.2",
     "engines": {
         "vscode": "^1.103.0"
     },
@@ -28,9 +28,7 @@
         "type": "github",
         "url": "https://github.com/th3pool/all-files-formatter"
     },
-    "activationEvents": [
-        "onStartupFinished"
-    ],
+    "activationEvents": [],
     "main": "./dist/extension.js",
     "contributes": {
         "commands": [
