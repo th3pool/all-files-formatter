@@ -1,5 +1,4 @@
 import path from 'path';
-import { channel } from 'process';
 import * as vscode from 'vscode';
 import { workspace } from 'vscode';
 
@@ -179,7 +178,7 @@ async function formatFiles(files: vscode.Uri[]) {
             sentLog(`: Complete!`);
         } catch (error) {
             if (error instanceof Error) {
-                if (error.name == 'CodeExpectedError') {
+                if (error.name === 'CodeExpectedError') {
                     sentLog(`This file is not text, skipping.`);
                 } else {
                     errorCount++;
