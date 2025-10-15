@@ -1,4 +1,5 @@
 import path from 'path';
+import { channel } from 'process';
 import * as vscode from 'vscode';
 import { workspace } from 'vscode';
 
@@ -177,11 +178,16 @@ async function formatFiles(files: vscode.Uri[]) {
             }
             sentLog(`: Complete!`);
         } catch (error) {
-            errorCount++;
             if (error instanceof Error) {
-                sentLog('');
-                sentLog('[Error] message:', false);
-                sentLog(error.message);
+                if (error.name == 'CodeExpectedError') {
+                    sentLog(`This file is not text, skipping.`);
+                } else {
+                    errorCount++;
+                    sentLog('');
+                    sentLog('[Error] message:', false);
+                    sentLog(error.message);
+                    sentLog(error.name);
+                }
             }
         }
     }
@@ -223,6 +229,7 @@ async function formatFiles(files: vscode.Uri[]) {
                         funnyLogs[Math.floor(Math.random() * funnyLogs.length)];
                     sentLog('');
                     sentLog(msg);
+                    outputChannel.show();
                 }
             });
     }
