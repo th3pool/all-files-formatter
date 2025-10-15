@@ -2,7 +2,7 @@
     "name": "all-files-formatter",
     "displayName": "All files formatter",
     "description": "Format all files in the workspace, in a single command",
-    "version": "0.2.2",
+    "version": "0.2.3",
     "engines": {
         "vscode": "^1.103.0"
     },
