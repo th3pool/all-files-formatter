@@ -83,7 +83,8 @@
                             "**/*.eot",
                             "**/*.log",
                             "**/*.bak",
-                            "**/*.tmp"
+                            "**/*.tmp",
+                            "**/*.svg"
                         ],
                         "items": {
                             "type": "string"
@@ -127,6 +128,7 @@
         "test": "vscode-test"
     },
     "devDependencies": {
+        "@biomejs/biome": "2.5.2",
         "@types/mocha": "^10.0.10",
         "@types/node": "~22.19.15",
         "@types/vscode": "^1.103.0",
