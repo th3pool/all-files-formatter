@@ -12,6 +12,7 @@
         "alwaysStrict": true,
         "noImplicitAny": true,
         "noImplicitThis": true,
-        "noUnusedLocals": true
+        "noUnusedLocals": true,
+        "types": ["node"]
     }
 }

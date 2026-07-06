@@ -1,4 +1,4 @@
-import path from 'path';
+import path from 'node:path';
 import * as vscode from 'vscode';
 import { workspace } from 'vscode';
 
@@ -17,28 +17,28 @@ export async function activate(context: vscode.ExtensionContext) {
             ignorePattern = await getIgnorePattern();
             const filesToFormat = await getFilesToFormat(
                 includePattern,
-                ignorePattern
+                ignorePattern,
             );
             if (filesToFormat.length >= 1) {
                 vscode.window
                     .showInformationMessage(
                         `Do you really want to format ${filesToFormat.length} file(s)`,
                         'yes',
-                        'no'
+                        'no',
                     )
                     .then((selection) => {
                         if (selection === 'yes') {
                             formatFiles(filesToFormat);
                         } else {
                             vscode.window.showInformationMessage(
-                                `Process cancelled!`
+                                `Process cancelled!`,
                             );
                         }
                     });
             } else {
                 vscode.window.showErrorMessage(`No files to work with`);
             }
-        }
+        },
     );
     context.subscriptions.push(formatAll);
 }
@@ -48,13 +48,13 @@ export function deactivate() {}
 function getIncludePattern() {
     console.log(`Getting include pattern`);
 
-    let patternsToIgnore: string[] | undefined = settings.get(
-        'inclusions.includePatterns'
+    const patternsToIgnore: string[] | undefined = settings.get(
+        'inclusions.includePatterns',
     );
     let tempPattern = '';
     if (patternsToIgnore) {
         patternsToIgnore.forEach((element) => {
-            tempPattern += element + ',';
+            tempPattern += `${element},`;
         });
     }
     tempPattern = tempPattern.slice(0, -1);
@@ -63,17 +63,17 @@ function getIncludePattern() {
 async function getIgnorePattern() {
     console.log(`Getting ignore pattern`);
 
-    let patternsToIgnore: string[] | undefined = settings.get(
-        'exclusions.ignorePatterns'
+    const patternsToIgnore: string[] | undefined = settings.get(
+        'exclusions.ignorePatterns',
     );
     let tempPattern = '';
     if (patternsToIgnore) {
         patternsToIgnore.forEach((element) => {
-            tempPattern += element + ',';
+            tempPattern += `${element},`;
         });
     }
     const readGit: boolean | undefined = settings.get(
-        'exclusions.includeGitignore'
+        'exclusions.includeGitignore',
     );
     if (readGit) {
         sentLog(`Request to check .gitignore? true`);
@@ -88,7 +88,7 @@ async function getIgnorePattern() {
 
 async function readGitignore(): Promise<string> {
     sentLog(`Getting gitignore patters`);
-    let gitignoreFiles = await workspace.findFiles('**/.gitignore');
+    const gitignoreFiles = await workspace.findFiles('**/.gitignore');
     let ignoresContent = '';
     if (gitignoreFiles.length >= 1) {
         sentLog(`found ${gitignoreFiles.length} gitignore files`);
@@ -96,8 +96,8 @@ async function readGitignore(): Promise<string> {
             const location = workspace
                 .asRelativePath(element.fsPath)
                 .replace(path.basename(element.fsPath), '');
-            let fileData = Buffer.from(
-                await workspace.fs.readFile(element)
+            const fileData = Buffer.from(
+                await workspace.fs.readFile(element),
             ).toString('utf8');
             let eachLine = fileData.split(/\r?\n/g);
             eachLine = eachLine.filter((element) => {
@@ -115,16 +115,16 @@ async function readGitignore(): Promise<string> {
                 }
             });
             sentLog(
-                `the file ${element.fsPath} has ${eachLine.length} glob patterns after cleanup`
+                `the file ${element.fsPath} has ${eachLine.length} glob patterns after cleanup`,
             );
             sentArrayLog(eachLine);
 
             const final = eachLine.join(',');
-            ignoresContent += final + ',';
+            ignoresContent += `${final},`;
 
             function isEmpty(line: string) {
                 line = line.trim();
-                return !(line === '' || line.startsWith('#') ? true : false);
+                return !(line === '' || line.startsWith('#'));
             }
         }
     }
@@ -133,16 +133,16 @@ async function readGitignore(): Promise<string> {
 }
 
 async function getFilesToFormat(include: string, exclude: string) {
-    let allFiles = await workspace.findFiles(include, exclude);
+    const allFiles = await workspace.findFiles(include, exclude);
     sentLog(
-        `Found ${allFiles.length} files to format \nIgnore pattern: ${ignorePattern}\nInclude pattern: ${includePattern}\n`
+        `Found ${allFiles.length} files to format \nIgnore pattern: ${ignorePattern}\nInclude pattern: ${includePattern}\n`,
     );
     return allFiles;
 }
 
 const outputChannel = vscode.window.createOutputChannel(
     'format-all-files',
-    'markdown'
+    'markdown',
 );
 
 function sentLog(message: string, newLine = true) {
@@ -165,14 +165,14 @@ async function formatFiles(files: vscode.Uri[]) {
         try {
             await vscode.window.showTextDocument(files[index]);
             await vscode.commands.executeCommand(
-                'editor.action.formatDocument'
+                'editor.action.formatDocument',
             );
             const closeFiles: boolean | undefined = settings.get(
-                'automaticallyCloseFiles'
+                'automaticallyCloseFiles',
             );
             if (closeFiles) {
                 await vscode.commands.executeCommand(
-                    'workbench.action.closeActiveEditor'
+                    'workbench.action.closeActiveEditor',
                 );
             }
             sentLog(`: Complete!`);
@@ -194,89 +194,25 @@ async function formatFiles(files: vscode.Uri[]) {
         vscode.window
             .showInformationMessage(
                 `Process complete, ${files.length} files successfully formatted!`,
-                'Check logs'
+                'Check logs',
             )
             .then((ans) => {
                 if (ans) {
                     outputChannel.show();
                 }
             });
-        const msg =
-            funnySuccessLogs[
-                Math.floor(Math.random() * funnySuccessLogs.length)
-            ];
         sentLog('');
-        sentLog(msg);
     } else {
         vscode.window
             .showInformationMessage(
                 `Process complete, some errors were catch in the process, would you like to see then?`,
                 'yes',
-                'no'
+                'no',
             )
             .then((answer) => {
-                if (answer === 'no') {
-                    const msg =
-                        funnySuccessLogs[
-                            Math.floor(Math.random() * funnySuccessLogs.length)
-                        ];
-                    sentLog('');
-
-                    sentLog(msg);
-                } else {
-                    const msg =
-                        funnyLogs[Math.floor(Math.random() * funnyLogs.length)];
-                    sentLog('');
-                    sentLog(msg);
+                if (answer === 'yes') {
                     outputChannel.show();
                 }
             });
     }
 }
-
-// This messages where generated with AI because I am too lazy and unfunny to create them myself
-const funnyLogs = [
-    'Hide the dinos, boss is coming!',
-    'Well… that escalated quickly.',
-    'Here be bugs.',
-    'Abort mission, we hit an asteroid!',
-    'Nothing to see here, just some casual chaos.',
-    'When in doubt, blame the compiler.',
-    'I swear it worked on my machine.',
-    'Feature or bug? You decide.',
-    '99 little bugs in the code, 99 little bugs...',
-    'Error 404: Patience not found.',
-    'The cake is a lie, and so is this success.',
-    'Don’t worry, this is a ‘temporary’ problem.',
-    'At least we didn’t delete production… yet.',
-    'One does not simply format all files without errors.',
-    'It’s not a bug, it’s an undocumented feature.',
-    'Houston, we have a problem.',
-    'Plot twist: the formatter is formatting itself.',
-    'Brace yourself, logs are coming.',
-    'Don’t panic. Actually, panic a little.',
-    'Surprise! More errors than expected.',
-];
-// This too
-const funnySuccessLogs = [
-    'All files polished and shiny!',
-    'Mission accomplished. High five!',
-    'Code formatted, bugs intimidated.',
-    'Flawless victory.',
-    'Formatter has left the chat.',
-    'Everything is awesome!',
-    'Zero errors, zero worries.',
-    'The formatter gods are pleased.',
-    'Smooth as butter.',
-    'Victory royale!',
-    'Done and dusted.',
-    'The code is strong with this one.',
-    'May the format be with you.',
-    'Formatting complete. Coffee break?',
-    'Code so clean you could eat off it.',
-    'No errors detected… today.',
-    'Your files are now 20% cooler.',
-    'Achievement unlocked: Proper Formatting!',
-    'Looks like you actually know what you’re doing.',
-    'All green lights — deploy at will!',
-];
